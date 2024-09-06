@@ -13,8 +13,24 @@ app.get('/', function(req, res){
 })
 
 app.get('/read', async function(req, res){
-    let users = await userModel.find()
+    let users = await userModel.find();
     res.render('read', {users});
+})
+
+app.get('/delete/:id', async function(req, res){
+    let users = await userModel.findOneAndDelete({_id: req.params.id});
+    res.redirect('/read');
+})
+
+app.get('/edit/:userid', async function(req, res){
+    let user = await userModel.findOne({_id:req.params.userid});
+    res.render("edit", {user})
+})
+
+app.post('/update/:userid', async function(req, res){
+    let {name, email, image} = req.body;
+    let user = await userModel.findOneAndUpdate({_id:req.params.userid}, {name, email, image});
+    res.redirect("/read")
 })
 
 app.post('/create', async function(req, res){
@@ -24,7 +40,9 @@ app.post('/create', async function(req, res){
         email,
         image
     })
-    res.send(createdUser);  
+    res.redirect("/read");  
 })
+
+
 
 app.listen(3000);
